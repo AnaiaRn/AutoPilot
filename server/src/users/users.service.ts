@@ -11,6 +11,10 @@ export class UsersService {
   private usersRepository: Repository<User>
  ) {}
 
+ async findById (id: number): Promise<User | undefined> {
+  return this.usersRepository.findOne({ where : {id}});
+ }
+
  async create(user: Partial<User>): Promise<User> {
   const existingUser = await this.usersRepository.findOne({ 
     where: { username: user.username } 
@@ -19,6 +23,8 @@ export class UsersService {
   if (existingUser) {
     throw new ConflictException('Username déjà pris');
   }
+
+  
 
   const hashedPassword = await brcypt.hash(user.password, 10);
   const newUser = this.usersRepository.create({
