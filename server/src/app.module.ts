@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi'; // Validation des variables
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import * as Joi from 'joi'; // Validation des variables
       }),
       inject: [ConfigService],
     }),
+    UsersModule
   ],
 })
 export class AppModule {}

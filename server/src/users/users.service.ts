@@ -1,55 +1,69 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as brcypt from 'bcrypt'
+import { CreateUserDto } from './dto/create-user.dto';
+
 
 @Injectable()
 export class UsersService {
  constructor (
   @InjectRepository(User)
-  private usersRepository: Repository<User>
+  private usersRepository: Repository<User>,
  ) {}
 
- async findById (id: number): Promise<User | undefined> {
-  return this.usersRepository.findOne({ where : {id}});
- }
-
- async create(user: Partial<User>): Promise<User> {
-  const existingUser = await this.usersRepository.findOne({ 
-    where: { username: user.username } 
+ async create (createUserDto: CreateUserDto): Promise<Omit<User, 'password'>> {
+  const existingUser = await this.usersRepository.findOne({
+    where: [{ username: createUserDto.username}, { email: createUserDto.email}],
   });
 
   if (existingUser) {
-    throw new ConflictException('Username déjà pris');
+    throw new ConflictException('Username or email already exists');
   }
 
-  
-
-  const hashedPassword = await brcypt.hash(user.password, 10);
+  const hashedPassword = await brcypt.hash(createUserDto.password, 10);
   const newUser = this.usersRepository.create({
-    ...user,
-    password: hashedPassword
+    ...createUserDto, password: hashedPassword,
   });
 
-  return this.usersRepository.save(newUser);
+  const { password, ...result } = await this.usersRepository.save(newUser);
+
+  return result;
  }
 
- async findOne (username: string): Promise<User | undefined> {
-  return this.usersRepository.findOne({ where : {username }});
+ async findAll(): Promise<Omit<User, 'password'>[]> {
+  try {
+    const users = await this.usersRepository.find();
+    return users.map(({ password, ...user }) => user);
+  } catch (error) {
+    throw new InternalServerErrorException('Failed to retrieve users');
+  }
+}
+
+
+ async findOne(id: number): Promise<Omit<User, 'password'>> {
+  const user = await this.usersRepository.findOneBy({ id });
+  if (!user) throw new NotFoundException('User not found');
+  const { password, ...result} = user;
+  return result;
  }
 
- async findAll(): Promise<User[]> {
-  return this.usersRepository.find();
+ async update (id: number, updateData: Partial<User>): Promise<Omit<User, 'password'>> {
+ const result = await this.usersRepository.update(id, updateData);
+  if (result.affected === 0) {
+    throw new NotFoundException('User not found');
+  }
+  return this.findOne(id);
  }
 
- async update(id: number, updateData: Partial<User>): Promise<User> {
-  await this.usersRepository.update(id, updateData);
-  return this.usersRepository.findOne({ where : {id}});
+ async remove (id: number): Promise <void> {
+  const result = await this.usersRepository.delete(id);
+  if (result.affected === 0) {
+    throw new NotFoundException('User not found');
+  }
  }
 
- async remove(id: number): Promise<void> {
-  await this.usersRepository.delete(id);
- }
+
   
 }
