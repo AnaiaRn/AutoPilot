@@ -49,6 +49,13 @@ export class UsersService {
   return result;
  }
 
+ async findByUsernameWithPassword(username: string): Promise <User> {
+  return this.usersRepository.createQueryBuilder('user')
+  .addSelect('user password')
+  .where('user.username = :username', {username})
+  .getOne();
+ }
+
  async update (id: number, updateData: Partial<User>): Promise<Omit<User, 'password'>> {
  const result = await this.usersRepository.update(id, updateData);
   if (result.affected === 0) {
@@ -57,13 +64,11 @@ export class UsersService {
   return this.findOne(id);
  }
 
- async remove (id: number): Promise <void> {
+ async remove(id: number): Promise<void> {
   const result = await this.usersRepository.delete(id);
-  if (result.affected === 0) {
-    throw new NotFoundException('User not found');
-  }
- }
-
-
   
+  if (result.affected === 0) {
+    throw new NotFoundException(`User with ID ${id} not found`);
+  }
+}
 }
