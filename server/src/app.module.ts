@@ -36,7 +36,7 @@ import { UsersModule } from './users/users.module';
       }),
       inject: [ConfigService],
     }),
-    UsersModule
+    UsersModule,
   ],
 })
 export class AppModule {}
