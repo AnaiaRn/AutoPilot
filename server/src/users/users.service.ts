@@ -49,11 +49,9 @@ export class UsersService {
   return result;
  }
 
- async findByUsernameWithPassword(username: string): Promise <User> {
-  return this.usersRepository.createQueryBuilder('user')
-  .addSelect('user password')
-  .where('user.username = :username', {username})
-  .getOne();
+ 
+ async findOneByEmail (email: string) : Promise <User | null > {
+  return this.usersRepository.findOne({where: {email}});
  }
 
  async update (id: number, updateData: Partial<User>): Promise<Omit<User, 'password'>> {
