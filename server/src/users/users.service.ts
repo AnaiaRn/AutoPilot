@@ -49,9 +49,11 @@ export class UsersService {
   return result;
  }
 
- 
- async findOneByEmail (email: string) : Promise <User | null > {
-  return this.usersRepository.findOne({where: {email}});
+ async findOneByEmail(email: string): Promise<User | null> {
+  return this.usersRepository.findOne({
+    where: { email },
+    select: ['id', 'email', 'password', 'role', 'username']
+  })
  }
 
  async update (id: number, updateData: Partial<User>): Promise<Omit<User, 'password'>> {
