@@ -3,11 +3,16 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UsersModule } from '../users/users.module';  // Import modifié
+import { UsersModule } from '../users/users.module';  
+import { ScheduleModule } from '@nestjs/schedule';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { RevokedToken } from './entities/revoked-token.entity';
 
 @Module({
   imports: [
-    UsersModule,  // Importez le module entier au lieu du service seul
+    ScheduleModule.forRoot(),
+    TypeOrmModule.forFeature([RevokedToken]),
+    UsersModule,  
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -18,6 +23,6 @@ import { UsersModule } from '../users/users.module';  // Import modifié
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],  // Retirez UsersService des providers
+  providers: [AuthService],  
 })
 export class AuthModule {}

@@ -6,8 +6,9 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService, // Syntaxe correcte sans =
-    private readonly jwtService: JwtService,    // Syntaxe correcte sans =
+    private readonly usersService: UsersService, 
+    private readonly jwtService: JwtService,   
+    // private revokedTokenService: RevokedTokenService,
   ) {}
 
   async register(registerDto: any) {
