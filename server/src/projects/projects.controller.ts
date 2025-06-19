@@ -1,15 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, ParseIntPipe, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('projects')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
   
   @Post()
-  create(@Body() createProjectDto: CreateProjectDto, @Req() req) {
-    return this.projectsService.create(req.user.id, createProjectDto);
+  @UseGuards(AuthGuard('jwt'))
+  async create(
+    @Body() createProjectDto: CreateProjectDto,
+    @Req() req: any,
+  ) {
+    if (!req.user || !req.user.sub) {
+      throw new UnauthorizedException('Invalid user')
+    }
   }
 
   @Get()

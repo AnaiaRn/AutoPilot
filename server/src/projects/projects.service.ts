@@ -4,6 +4,7 @@ import { Project } from './entities/project.entity';
 import { Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class ProjectsService {
@@ -13,13 +14,20 @@ export class ProjectsService {
     private projectsRepository: Repository<Project>,
   ) {}
 
-  async create(userId: number, createProjectDto: CreateProjectDto): Promise<Project> {
+ async create (userId: number, createProjectDto: CreateProjectDto): Promise<Project> {
+  try {
     const project = this.projectsRepository.create({
       ...createProjectDto,
-      user: { id: userId },
+      user: { id: userId} as User
     });
-    return this.projectsRepository.save(project);
+
+    return await this.projectsRepository.save(project);
+  } catch (error) {
+    console.error('Error creating project:', error);
+    throw new error('Failed to create project');
   }
+ }
+
 
   async findAllByUser(userId: number): Promise<Project[]> {
     return this.projectsRepository.find({
