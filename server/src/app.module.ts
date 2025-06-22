@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi'; // Validation des variables
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { ProjectModule } from './project/project.module';
 
 @Module({
   imports: [
@@ -34,13 +33,13 @@ import { ProjectModule } from './project/project.module';
         database: config.get('DB_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: config.get('DB_SYNCHRONIZE'),
-        logging: false,
+        logging: true,
+        logger: 'advanced-console'
       }),
       inject: [ConfigService],
     }),
     UsersModule,
-    AuthModule,
-    ProjectModule,
+    AuthModule,    ,
   ],
 })
 export class AppModule {}

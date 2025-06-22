@@ -1,4 +1,3 @@
-import { Project } from "src/project/entities/project.entity";
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
@@ -18,7 +17,6 @@ export class User {
     @Column({ default: 'user' })
     role: string;
 
-    @OneToMany(() => Project, (project) => project.user)
-    projects: Project[];
+   
 
 }
