@@ -1,1 +1,19 @@
-export class Project {}
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+
+@Entity()
+export class Project {
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
+    titre: string;
+
+    @Column()
+    description: string;
+
+    @Column({ type: "decimal", precision: 10, scale: 2 })
+    budget: number;
+
+     @Column({ type: 'timestamp', nullable: false }) // Explicite NOT NULL
+    deadline: Date;
+}
