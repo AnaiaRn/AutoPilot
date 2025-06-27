@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Plan } from "src/plans/entities/plan.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Project {
@@ -16,4 +17,7 @@ export class Project {
 
      @Column({ type: 'timestamp', nullable: false }) // Explicite NOT NULL
     deadline: Date;
+
+    @OneToMany(() => Plan, plan => plan.project)
+    plans: Plan[];
 }

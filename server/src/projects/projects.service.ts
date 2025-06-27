@@ -4,16 +4,26 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './entities/project.entity';
 import { Repository } from 'typeorm';
+import { PlanGeneratorService } from 'src/plans/plan-generator.service';
 
 @Injectable()
 export class ProjectsService {
   constructor (
     @InjectRepository(Project)
     private projectsRepository: Repository<Project>,
+    private planGeneratorService: PlanGeneratorService,
+
   ) {}
 
   async create (createProjectDto: CreateProjectDto): Promise<Project> {
     const project = this.projectsRepository.create(createProjectDto);
+    const savedProject = await this.projectsRepository.save(project);
+
+    try {
+      await this.planGeneratorService.generatePlan(savedProject);
+    } catch (error) {
+      console.error('Failed to generate plan automaically', error);
+    }
     return this.projectsRepository.save(project);
   }
 
@@ -23,6 +33,14 @@ export class ProjectsService {
 
   async findOne(id: number): Promise<Project> {
     return this.projectsRepository.findOneBy({ id });
+  }
+
+  onModuleInit() {
+    this.projectsRepository.metadata.relations.forEach(relation => {
+      if (relation.propertyName === 'plans') {
+        relation.inverseSidePropertyPath = 'project';
+      }
+    })
   }
 
   async update (id: number, updateProjectDto: UpdateProjectDto): Promise<Project> {
