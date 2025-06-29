@@ -5,7 +5,6 @@ import * as Joi from 'joi'; // Validation des variables
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ProjectsModule } from './projects/projects.module';
-import { PlansModule } from './plans/plans.module';
 
 @Module({
   imports: [
@@ -43,7 +42,6 @@ import { PlansModule } from './plans/plans.module';
     UsersModule,
     AuthModule,
     ProjectsModule,
-    PlansModule,    
   ],
 })
 export class AppModule {}
