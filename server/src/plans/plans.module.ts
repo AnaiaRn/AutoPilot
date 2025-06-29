@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Plan } from './entities/plan.entity';
+import { PlanGeneratorService } from './plan-generator.service';
 import { PlansController } from './plans.controller';
 import { ProjectsModule } from '../projects/projects.module';
-import { PlanGeneratorService } from './plan-generator.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Plan]), // Ceci fournit le PlanRepository
-    ProjectsModule, // Pour avoir accès au ProjectsService
+    TypeOrmModule.forFeature([Plan]),
+    ProjectsModule,
   ],
   controllers: [PlansController],
   providers: [PlanGeneratorService],
-  exports: [PlanGeneratorService], // Si d'autres modules en ont besoin
+  exports: [PlanGeneratorService], // Important pour l'export
 })
 export class PlansModule {}

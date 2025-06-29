@@ -15,24 +15,27 @@ export class ProjectsService {
 
   ) {}
 
-  async create (createProjectDto: CreateProjectDto): Promise<Project> {
+ async create(createProjectDto: CreateProjectDto): Promise<Project> {
     const project = this.projectsRepository.create(createProjectDto);
     const savedProject = await this.projectsRepository.save(project);
 
     try {
       await this.planGeneratorService.generatePlan(savedProject);
     } catch (error) {
-      console.error('Failed to generate plan automaically', error);
+      console.error('Failed to generate plan automatically', error);
     }
-    return this.projectsRepository.save(project);
+    return savedProject; // Retournez savedProject au lieu de sauvegarder à nouveau
   }
 
   async findAll(): Promise<Project[]> {
-    return this.projectsRepository.find();
+    return this.projectsRepository.find({ relations: ['plans'] });
   }
 
   async findOne(id: number): Promise<Project> {
-    return this.projectsRepository.findOneBy({ id });
+    return this.projectsRepository.findOne({ 
+      where: { id },
+      relations: ['plans'] 
+    });
   }
 
   onModuleInit() {

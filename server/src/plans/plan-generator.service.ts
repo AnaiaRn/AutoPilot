@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import { Plan } from './entities/plan.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from 'src/projects/entities/project.entity';
+import { ProjectsService } from 'src/projects/projects.service';
 
 @Injectable()
 export class PlanGeneratorService {
@@ -14,6 +15,8 @@ export class PlanGeneratorService {
     private configService: ConfigService,
     @InjectRepository(Plan)
     private planRepository: Repository<Plan>,
+    @Inject(forwardRef(() => ProjectsService))
+    private projectsService: ProjectsService,
   ) {
     this.openai = new OpenAI({
       apiKey: this.configService.get<string>('OPENAI_KEY'),
